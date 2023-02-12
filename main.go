@@ -23,10 +23,12 @@ func main() {
 	r.GET("/auth/validate", middleware.RequireAuth, controllers.Validate)
 
 	// posts routes
-	r.POST("/posts", controllers.PostsCreate)
+	r.POST("/posts", middleware.RequireAuth, controllers.PostsCreate)
 	r.GET("/posts", controllers.PostsIndex)
+	r.GET("/posts/user", middleware.RequireAuth, controllers.PostsUserIndex)
 	r.GET("/posts/:id", controllers.PostsShow)
-	r.PUT("/posts/:id", controllers.PostsUpdate)
-	r.DELETE("/posts/:id", controllers.PostsDelete)
+	r.PUT("/posts/:id", middleware.RequireAuth, controllers.PostsUpdate)
+	r.DELETE("/posts/:id", middleware.RequireAuth, controllers.PostsDelete)
+
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
