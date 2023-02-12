@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/edutjie/go-crud/controllers"
 	"github.com/edutjie/go-crud/initializers"
+	"github.com/edutjie/go-crud/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,8 @@ func main() {
 	// auth routes
 	r.POST("/auth/register", controllers.Register)
 	r.POST("/auth/login", controllers.Login)
+	r.GET("/auth/logout", controllers.Logout)
+	r.GET("/auth/validate", middleware.RequireAuth, controllers.Validate)
 
 	// posts routes
 	r.POST("/posts", controllers.PostsCreate)

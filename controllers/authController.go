@@ -89,14 +89,36 @@ func Login(c *gin.Context) {
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(os.Getenv("JWT_SECRET"))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Signing error: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create token: " + err.Error()})
 		return
 	}
 
-	// return the token
+	// set the cookie
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", tokenString, 60*60*24*30, "/", "localhost", false, true)
+
+	// return the user
 	c.JSON(http.StatusOK, gin.H{
-		"token": tokenString,
+		"user": user,
+	})
+}
+
+func Logout(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", "", -1, "/", "localhost", false, true)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
+}
+
+func Validate(c *gin.Context) {
+	// get user
+	user := c.MustGet("user").(models.User)
+
+	// return the user
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
 	})
 }
